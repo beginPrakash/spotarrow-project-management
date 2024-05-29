@@ -137,7 +137,7 @@ if(isset($_POST['submit'])){
   ======================================================== -->
 </head>
 
-<body>
+<body class="toggle-sidebar">
 
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
@@ -147,7 +147,7 @@ if(isset($_POST['submit'])){
         <img src="assets/img/logo.png" alt="">
         <span class="d-none d-lg-block">Admin</span>
       </a>
-      <i class="bi bi-list toggle-sidebar-btn"></i>
+      <!-- <i class="bi bi-list toggle-sidebar-btn"></i> -->
     </div><!-- End Logo -->
 
 
@@ -177,7 +177,7 @@ if(isset($_POST['submit'])){
   </header><!-- End Header -->
 
   <!-- ======= Sidebar ======= -->
-  <aside id="sidebar" class="sidebar">
+  <!-- <aside id="sidebar" class="sidebar">
 
     <ul class="sidebar-nav" id="sidebar-nav">
 
@@ -186,7 +186,7 @@ if(isset($_POST['submit'])){
           <i class="bi bi-grid"></i>
           <span>Dashboard</span>
         </a>
-      </li><!-- End Dashboard Nav -->
+      </li>
 
 
       <li class="nav-item">
@@ -194,12 +194,13 @@ if(isset($_POST['submit'])){
           <i class="bi bi-box-arrow-in-right"></i>
           <span>Logout</span>
         </a>
-      </li><!-- End Login Page Nav -->
+      </li>
 
 
     </ul>
 
-  </aside><!-- End Sidebar-->
+  </aside> -->
+  <!-- End Sidebar-->
 
   <main id="main" class="main">
 
@@ -248,7 +249,7 @@ if(isset($_POST['submit'])){
       </div>
     </section>
     <?php 
-    if (isset($_SESSION['id']) && isset($_SESSION['email'])) { ?>
+    if (isset($_SESSION['id']) && isset($_SESSION['user_name'])) { ?>
         <section class="section">
         <div class="row">
             <div class="col-lg-12">
@@ -260,8 +261,7 @@ if(isset($_POST['submit'])){
                     <thead>
                     <tr>
                             <th>Project</th>
-                            <th>Url</th>
-                            <th>Client</th>
+                            <th style="display:none">Url</th>
                             <th>Tags</th>
                             <th>Industry</th>
                             <th>Theme</th>
@@ -274,10 +274,10 @@ if(isset($_POST['submit'])){
                         <?php if(!empty($rows) && count($rows) > 0){
                                 foreach($rows as $key => $val){ ?>
                                     <tr>
-                                        <td scope="row"><?php echo $val['name']; ?> (<a href="statuschange.php?id=<?php echo $val['id']; ?>&status=<?php echo $val['status']; ?>"><?php echo $val['status']; ?>)</td>
-                                        <td class="<?php if($val['status'] == 'active'){ echo  'list'; }?>"><a href="<?php echo $val['link']; ?>" target="_blank"><?php echo $val['link']; ?></a></td>
-                                        <td><?php echo $val['client']; ?></td>
-                                        <td><?php echo $val['tag']; ?></td>
+                                        <td scope="row"><a href="<?php echo $val['link']; ?>" target="_blank"><?php echo $val['name']; ?></a> (<a href="statuschange.php?id=<?php echo $val['id']; ?>&status=<?php echo $val['status']; ?>"><?php echo $val['status']; ?>)</a><br>
+                                        <?php echo $val['client']; ?></td>
+                                        <td style="display:none" class="<?php if($val['status'] == 'active'){ echo  'list'; }?>"><a href="<?php echo $val['link']; ?>" target="_blank"><?php echo $val['link']; ?></a></td>
+                                        <td><?php echo preg_replace('/(?<!\ )[,]/', '$0 ', $val['tag']); ?></td>
                                         <td><?php echo $val['industry']; ?></td>
                                         <td><?php echo $val['theme']; ?></td>
                                         <td><?php echo $val['plugins']; ?></td>
@@ -302,16 +302,15 @@ if(isset($_POST['submit'])){
                                 <td></td>
                                 <td></td>
                                 <td></td>
-                                <td></td>
                             </tr>
                             <?php if(!empty($feature_data) && count($feature_data) > 0){
                             foreach($feature_data as $key => $val){ 
                               $skey = 's'.$key; ?>
                                 <tr>
-                                    <td scope="row"><?php echo $val['name']; ?> (<a href="statuschange.php?id=<?php echo $val['id']; ?>&status=<?php echo $val['status']; ?>"><?php echo $val['status']; ?>)</td>
-                                    <td class="<?php if($val['status'] == 'active'){ echo  'list'; }?>"><a href="<?php echo $val['link']; ?>" target="_blank"><?php echo $val['link']; ?></a></td>
-                                    <td><?php echo $val['client']; ?></td>
-                                    <td><?php echo $val['tag']; ?></td>
+                                    <td scope="row"><a href="<?php echo $val['link']; ?>" target="_blank"><?php echo $val['name']; ?></a> (<a href="statuschange.php?id=<?php echo $val['id']; ?>&status=<?php echo $val['status']; ?>"><?php echo $val['status']; ?>)</a><br>
+                                    <?php echo $val['client']; ?></td>
+                                    <td style="display:none" class="<?php if($val['status'] == 'active'){ echo  'list'; }?>"><a href="<?php echo $val['link']; ?>" target="_blank"><?php echo $val['link']; ?></a></td>
+                                    <td><?php echo preg_replace('/(?<!\ )[,]/', '$0 ', $val['tag']); ?></td>
                                     <td><?php echo $val['industry']; ?></td>
                                     <td><?php echo $val['theme']; ?></td>
                                     <td><?php echo $val['plugins']; ?></td>
@@ -336,8 +335,10 @@ if(isset($_POST['submit'])){
         </div>
         </section>
         
-    <?php } else { ?>
-    <?php header("Location: user_login.php"); } ?>
+    <?php } else {?>
+      <?php echo "<script>location.href='user_login.php';</script>"; 
+
+  } ?>
   </main><!-- End #main -->
 
 
