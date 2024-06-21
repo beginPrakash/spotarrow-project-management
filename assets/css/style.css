@@ -47,6 +47,7 @@ h6 {
   transition: all 0.3s;
 }
 
+
 @media (max-width: 1199px) {
   #main {
     padding: 20px;
@@ -1230,4 +1231,24 @@ h6 {
   text-align: center;
   font-size: 13px;
   color: #012970;
+}
+
+.green_span{
+  height: 10px;
+  width: 10px;
+  background-color: #008000;
+  border-radius: 50%;
+  display: inline-block;
+}
+.red_span{
+  height: 10px;
+  width: 10px;
+  background-color: #FF0000;
+  border-radius: 50%;
+  display: inline-block;
+}
+.importSubmit {
+  position: relative;
+  left: 210px;
+  top: -35px;
 }

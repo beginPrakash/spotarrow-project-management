@@ -38,7 +38,7 @@ if (isset($_POST['submit'])) {
     $plugin_arr = [];
   endif;
   $query .= "
-    SELECT * FROM projects WHERE status!=''    
+    SELECT * FROM projects WHERE status='inactive'    
     ";
   if (!empty($tags_arr) && count($tags_arr) > 0) :
     foreach ($tags_arr as $key => $val) :
@@ -92,7 +92,7 @@ if (isset($_POST['submit'])) {
   }
 } else {
   $query .= "
-        SELECT * FROM projects";
+        SELECT * FROM projects where status='inactive'";
   $statement = $connect->prepare($query);
 
   $statement->execute();
@@ -102,41 +102,6 @@ if (isset($_POST['submit'])) {
     $rows[] = $row;
   }
 }
-//get feture project
-$query = "
-        SELECT * FROM projects WHERE is_feature>=1 ";
-$statement = $connect->prepare($query);
-
-$statement->execute();
-$feature_data = [];
-while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-  // /print_r($row);
-  $feature_data[] = $row;
-}
-
-if(isset($_POST["Export"])){
-  $filename = "sample_" . date('Y-m-d') . ".csv"; 
-
-  $delimiter = ","; 
-
-  $f = fopen('php://memory', 'w'); 
-
-  $fields = array('ID', 'Name', 'Link', 'Client', 'Tag', 'Status', 'Is feature', 'Industry', 'Theme', 'Plugins', 'Payment Gateway', 'Other Comments'); 
-  
-  fputcsv($f, $fields, $delimiter); 
-  $fields = array('1', 'Comment Biz', 'https://commentsbiz.com/', 'test', 'PHP,WordPress,MySQL', 'active', '0', 'CMS', 'Astra', 'Elementor, Listing Pro, WP Rocket', 'NA', 'CMS'); 
-  fputcsv($f, $fields, $delimiter);
-  fseek($f, 0); 
-
-  header('Content-Type: text/csv'); 
-
-  header('Content-Disposition: attachment; filename="' . $filename . '";'); 
-
-  fpassthru($f); 
-
-  exit();
-  
-}  
 
 ?>
 <!DOCTYPE html>
@@ -270,11 +235,6 @@ if(isset($_POST["Export"])){
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">Projects</h5>
-              <?php if (isset($_GET['success'])) { ?>
-
-                <h5 class="invalid-feedback" style="display:block;color:green;"><?php echo $_GET['success']; ?></h5>
-
-              <?php } ?>
               <form class="row g-3" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
                 <div class="col-md-2">
                   <label>Select Tag</label>
@@ -315,37 +275,15 @@ if(isset($_POST["Export"])){
                   <button class="btn btn-primary" type="submit" name="submit">Search</button>
                   <button type="button" id="copy-table-button" class="btn btn-primary" data-clipboard-target="#datatable"> Copy </button>
                   <button type="button" id="clear-button" class="btn btn-primary"> Clear </button>
-                  <button type="submit" name="Export" class="btn btn-primary">Sample CSV</button>
-                  <button type="button" name="Import" class="btn btn-primary import_btn">Import</button>
                 </div>
-                <!-- CSV file upload form -->
-              
               </form>
-              <div class="col-md-12" id="importFrm" style="display: none;">
-                  <form action="import_data.php" method="post" enctype="multipart/form-data">
-                  <div class="col-md-6">
-                    <label>Upload File</label>
-                    <div class="input-group">
-                      <input type="file" name="file" accept=".csv"/>
-                          <?php if (isset($_GET['error'])) { ?>
 
-                            <div class="invalid-feedback" style="display:block;"><?php echo $_GET['error']; ?></div>
-
-                          <?php } ?>
-                          <input type="submit" class="btn btn-primary importSubmit" name="importSubmit" value="IMPORT">
-                    </div>
-                    
-                    <br />
-                </div>
-                  </form>
-              </div>
             </div>
           </div>
 
         </div>
 
       </div>
-
     </section>
     <?php
     if (isset($_SESSION['id']) && isset($_SESSION['user_name'])) { ?>
@@ -378,13 +316,13 @@ if(isset($_POST["Export"])){
                                   <a href="<?php echo $val['link']; ?>" target="_blank">
                                     <?php echo $val['name']; ?>
                                   </a>
-                                  <a href="statuschange.php?id=<?php echo $val['id']; ?>&status=<?php echo $val['status']; ?>&page=act">
+                                  <a href="statuschange.php?id=<?php echo $val['id']; ?>&status=<?php echo $val['status']; ?>&page=inact">
                                   <span class="<?php if($val['status'] == 'active'){ echo  'green_span'; }else{ echo  'red_span'; }?>"></span>
                                   </a>
                                   <?php echo $val['client']; ?>
                                   <a style="display:none" href="<?php echo $val['link']; ?>" target="_blank"><?php echo $val['link']; ?></a>
                                 </td>
-                                <td style="display:none" class="<?php if($val['status'] == 'active'){ echo  'list'; }?>"><a href="<?php echo $val['link']; ?>" target="_blank"><?php echo $val['link']; ?></a></td>
+                                <td style="display:none" class="<?php if($val['status'] == 'inactive'){ echo  'list'; }?>"><a href="<?php echo $val['link']; ?>" target="_blank"><?php echo $val['link']; ?></a></td>
                                 <td width="10%">
                                   <?php echo $val['industry']; ?>
                                 </td>
@@ -420,78 +358,6 @@ if(isset($_POST["Export"])){
                     <?php } ?>
                   </tbody>
                 </table>
-
-                <h5 class="card-title">Featured Projects</h5>
-
-                <table class="table" id="example">
-                  <thead>
-                    <tr>
-                      <th width="20%">Project</th>
-                      <th width="10%">Industry</th>
-                      <th width="10%">Theme</th>
-                      <th width="20%">Plugins</th>
-                      <th width="10%">Payment Gateways</th>
-                      <th width="30%">Comments</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-
-
-                    <?php if (!empty($feature_data) && count($feature_data) > 0) {
-                      foreach ($feature_data as $key => $val) {
-                        $skey = 's' . $key; ?>
-                        <tr>
-                          <td colspan="6">
-                            <table class="table" id="innertable">
-                              <tr>
-                                <td width="20%">
-                                  <a href="<?php echo $val['link']; ?>" target="_blank">
-                                    <?php echo $val['name']; ?>
-                                  </a>
-                                  <a href="statuschange.php?id=<?php echo $val['id']; ?>&status=<?php echo $val['status']; ?>&page=act">
-                                  <span class="<?php if($val['status'] == 'active'){ echo  'green_span'; }else{ echo  'red_span'; }?>"></span>
-                                  </a>
-                                  <?php echo $val['client']; ?>
-                                  <a style="display:none" href="<?php echo $val['link']; ?>" target="_blank"><?php echo $val['link']; ?></a>
-                                </td>
-                                <td style="display:none" class=""><a href="<?php echo $val['link']; ?>" target="_blank"><?php echo $val['link']; ?></a></td>
-                                <td width="10%">
-                                  <?php echo $val['industry']; ?>
-                                </td>
-                                <td width="10%">
-                                  <?php echo $val['theme']; ?>
-                                </td>
-                                <td width="20%">
-                                  <?php echo preg_replace('/(?<!\ )[,]/', '$0 ', $val['plugins']); ?>
-                                </td>
-                                <td width="10%">
-                                  <?php echo $val['payment_gateways']; ?>
-                                </td>
-                                <td width="30%">
-                                  <div class="comment_content content_<?php echo $skey; ?>" data-id="<?php echo $skey; ?>" data-text="<?php echo $val['other_comments']; ?>">
-                                    <p><?php echo $val['other_comments']; ?></p>
-                                  </div>
-                                </td>
-                              </tr>
-                              <tr>
-                                <td colspan="6">
-                                  <?php echo preg_replace('/(?<!\ )[,]/', '$0 ', $val['tag']); ?>
-                                </td>
-                              </tr>
-                                  </table>
-                                </td>
-                              </tr>
-                              
-                            <?php } ?>
-                    <?php } else { ?>
-                      <tr>
-                        <td colspan="10" align="center">No data found</td>
-                      </tr>
-                    <?php } ?>
-
-                  </tbody>
-                </table>
-                <!-- End Table with stripped rows -->
 
               </div>
             </div>
@@ -696,12 +562,7 @@ if(isset($_POST["Export"])){
 
 
     $(document).on('click', '#clear-button', function() {
-      location.replace('textauto.php');
-    });
-
-    $(document).on('click','.import_btn',function(){
-      $('#importFrm').show();
-      $('.import_btn').hide();
+      location.replace('inactive_projects.php');
     });
   </script>
 

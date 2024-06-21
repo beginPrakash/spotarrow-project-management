@@ -16,6 +16,10 @@ endif;
 $sql = "UPDATE projects SET status='".$status."' WHERE id='".$id."'";
 $stmt= $connect->prepare($sql);
 $res=$stmt->execute();
-header("Location: textauto.php"); 
+if($_GET["page"] == 'inact'):
+  header("Location: inactive_projects.php"); 
+else:
+  header("Location: textauto.php"); 
+endif;
 }
 ?>

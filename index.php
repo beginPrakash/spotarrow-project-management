@@ -24,19 +24,19 @@ if(isset($_POST['submit'])){
 
         if (empty($uname)) {
 
-            header("Location: user_login.php?error=User Name is required");
+            header("Location: index.php?error=User Name is required");
 
             exit();
 
         }else if(empty($pass)){
 
-            header("Location: user_login.php?error=Password is required");
+            header("Location: index.php?error=Password is required");
 
             exit();
 
         }else{
 
-            $connect = new PDO("mysql:host=localhost; dbname=test", "root", "");
+          $connect = new PDO("mysql:host=localhost; dbname=test", "root", "");
             $pass = md5($pass);
 
             $query = "SELECT * FROM users WHERE email='$uname' AND password='$pass'";
@@ -64,7 +64,7 @@ if(isset($_POST['submit'])){
 
                 }else{
 
-                    header("Location: user_login.php?error=Incorect User name or password");
+                    header("Location: index.php?error=Incorect User name or password");
 
                     exit();
 
@@ -72,7 +72,7 @@ if(isset($_POST['submit'])){
 
             }else{
 
-                header("Location: user_login.php?error=Incorect User name or password");
+                header("Location: index.php?error=Incorect User name or password");
 
                 exit();
 
@@ -141,7 +141,7 @@ if(isset($_POST['submit'])){
             <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
 
               <div class="d-flex justify-content-center py-4">
-                <a href="user_login.php" class="logo d-flex align-items-center w-auto">
+                <a href="index.php" class="logo d-flex align-items-center w-auto">
                   <img src="assets/img/logo.png" alt="">
                   <span class="d-none d-lg-block">Login</span>
                 </a>
